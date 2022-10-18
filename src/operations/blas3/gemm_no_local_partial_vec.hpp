@@ -465,7 +465,7 @@ class Gemm<input_t, output_t, DoubleBuffer, NbcA, NbcB, ClSize, tile_type,
       bool in_range =
           do_check<check_block>(chk_boundary(index + (work_per_load - 1)));
 
-      cl::sycl::vec<element_t, work_per_load> in_vec{0};
+      vec<element_t, work_per_load> in_vec{0};
       if (in_range) {
         in_vec.template load<address_t::global_space>(
             0,
@@ -508,7 +508,7 @@ class Gemm<input_t, output_t, DoubleBuffer, NbcA, NbcB, ClSize, tile_type,
   template <bool internal, index_t work_per_load, typename OutputPointerType>
   SYCL_BLAS_INLINE typename std::enable_if<internal>::type store_packet(
       element_t *reg, OutputPointerType out_ptr) {
-    cl::sycl::vec<element_t, work_per_load> out_vec{0};
+    vec<element_t, work_per_load> out_vec{0};
 
     out_vec.template load<address_t::private_space>(
         0, cl::sycl::multi_ptr<const element_t, address_t::private_space>(reg));
@@ -550,7 +550,7 @@ class Gemm<input_t, output_t, DoubleBuffer, NbcA, NbcB, ClSize, tile_type,
       for (int j = 0; j < item_rows / a_packet_size; j++) {
         if (do_check<check_block>(chk_boundary(dim_m_c_start + j * wg_rows,
                                                dim_n_c_start + i * wg_cols))) {
-          cl::sycl::vec<element_t, a_packet_size> out_vec{0};
+          vec<element_t, a_packet_size> out_vec{0};
 
           out_vec.template load<address_t::private_space>(
               0, cl::sycl::multi_ptr<const element_t, address_t::private_space>(

@@ -29,6 +29,8 @@
 #include <type_traits>
 #include <utility>
 
+#include <CL/sycl.hpp>
+
 namespace blas {
 
 /**
@@ -134,6 +136,28 @@ template <typename index_t>
 static SYCL_BLAS_INLINE index_t roundUp(index_t x, index_t y) {
   return ((x + y - 1) / y) * y;
 }
+
+template <typename DataT, int NumElements>
+class vec : public cl::sycl::vec<DataT, NumElements> {
+ private:
+  using base_t = cl::sycl::vec<DataT, NumElements>;
+
+ public:
+  // Inherit constructors.
+  using base_t::base_t;
+  /**
+   * Overload load and store to work around SYCL-2020 vec changes.
+   *
+   * Legacy SYCL-1.2.1 vec uses undecorated multi-ptrs. SYCL-2020 keeps the
+   * legacy multi-pointer interface, but IsDecorated must be equal set to
+   * Legacy. This is done by default in DPC++ and ComputeCpp.
+   **/
+  template <cl::sycl::access::address_space AddressSpace>
+  void store(size_t offset,
+             cl::sycl::multi_ptr<DataT, AddressSpace> ptr) const {
+    base_t::store(offset, ptr);
+  }
+};
 
 template <typename index_t, typename vector_t>
 index_t vec_total_size(index_t &vector_size, vector_t &&current_vector) {

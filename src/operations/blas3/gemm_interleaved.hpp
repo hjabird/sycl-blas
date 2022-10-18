@@ -33,7 +33,7 @@ namespace internal {
 
 template <class T, int Dim>
 struct packet {
-  using type = cl::sycl::vec<T, Dim>;
+  using type = vec<T, Dim>;
 };
 
 template <class T>
@@ -64,7 +64,7 @@ SYCL_BLAS_INLINE void store(T packet, PtrT ptr) {
  */
 template <address_t Address = address_t::global_space, class T, int Dim,
           class PtrT>
-SYCL_BLAS_INLINE void load(cl::sycl::vec<T, Dim> &packet, PtrT ptr) {
+SYCL_BLAS_INLINE void load(vec<T, Dim> &packet, PtrT ptr) {
   packet.template load<Address>(0, cl::sycl::multi_ptr<const T, Address>(ptr));
 }
 
@@ -73,7 +73,7 @@ SYCL_BLAS_INLINE void load(cl::sycl::vec<T, Dim> &packet, PtrT ptr) {
  */
 template <address_t Address = address_t::global_space, class T, int Dim,
           class PtrT>
-SYCL_BLAS_INLINE void store(const cl::sycl::vec<T, Dim> &packet, PtrT ptr) {
+SYCL_BLAS_INLINE void store(const vec<T, Dim> &packet, PtrT ptr) {
   packet.template store<Address>(0, ptr);
 }
 
