@@ -139,12 +139,12 @@ static SYCL_BLAS_INLINE index_t roundUp(index_t x, index_t y) {
 
 template <typename DataT, int NumElements>
 class vec : public cl::sycl::vec<DataT, NumElements> {
- private:
+ public:
   using base_t = cl::sycl::vec<DataT, NumElements>;
 
- public:
   // Inherit constructors.
   using base_t::base_t;
+
   /**
    * Overload load and store to work around SYCL-2020 vec changes.
    *

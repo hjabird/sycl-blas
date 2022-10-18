@@ -478,16 +478,20 @@ class Gemm<input_t, output_t, /* DoubleBuffer = */ false, /* NbcA = */ false,
    */
   SYCL_BLAS_INLINE void compute_block(packet_type *reg_a, packet_type *reg_b,
                                       packet_type *reg_res) noexcept {
+    using sycl_vec_t = packet_type::base_t;
+    auto vec_reg_a = reinterpret_cast<sycl_vec_t *>(reg_a);
+    auto vec_reg_b = reinterpret_cast<sycl_vec_t *>(reg_b);
+    auto vec_reg_res = reinterpret_cast<sycl_vec_t *>(reg_res);
 #pragma unroll
     for (int i = 0; i < item_cols; ++i) {
 #pragma unroll
       for (int j = 0; j < item_rows; ++j) {
 #pragma unroll
         for (int b = 0; b < item_batchs / VectorSize; ++b) {
-          *reg_res = cl::sycl::mad(reg_a[j * (item_batchs / VectorSize) + b],
-                                   reg_b[i * (item_batchs / VectorSize) + b],
-                                   *reg_res);
-          ++reg_res;
+          *vec_reg_res = cl::sycl::mad(
+              vec_reg_a[j * (item_batchs / VectorSize) + b],
+              vec_reg_b[i * (item_batchs / VectorSize) + b], *vec_reg_res);
+          ++vec_reg_res;
         }
       }
     }
